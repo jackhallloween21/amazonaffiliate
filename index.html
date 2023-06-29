@@ -71,6 +71,41 @@
     </table>
 
     <script>
+        // Retrieve stored products from local storage, if any
+        var storedProducts = JSON.parse(localStorage.getItem("uploadedProducts")) || [];
+
+        // Function to render the stored products on the page
+        function renderProducts() {
+            var productTable = document.getElementById("productTable");
+
+            // Clear the existing rows
+            while (productTable.rows.length > 1) {
+                productTable.deleteRow(1);
+            }
+
+            // Add rows for each stored product
+            for (var i = 0; i < storedProducts.length; i++) {
+                var product = storedProducts[i];
+
+                var newRow = productTable.insertRow(-1);
+
+                var nameCell = newRow.insertCell(0);
+                nameCell.textContent = product.name;
+
+                var imageCell = newRow.insertCell(1);
+                var imageElement = document.createElement("img");
+                imageElement.src = product.image;
+                imageElement.style.maxWidth = "100px";
+                imageCell.appendChild(imageElement);
+
+                var linkCell = newRow.insertCell(2);
+                var linkElement = document.createElement("a");
+                linkElement.href = product.link;
+                linkElement.textContent = "View Product";
+                linkCell.appendChild(linkElement);
+            }
+        }
+
         // Handle form submission for uploading a product
         document.getElementById("uploadForm").addEventListener("submit", function(event) {
             event.preventDefault(); // Prevent the form from submitting
@@ -80,38 +115,30 @@
             var productImage = document.getElementById("productImage").value;
             var productLink = document.getElementById("productLink").value;
 
-            // Create a new row for the uploaded product
-            var newRow = document.createElement("tr");
+            // Create an object for the uploaded product
+            var newProduct = {
+                name: productName,
+                image: productImage,
+                link: productLink
+            };
 
-            // Create table cells for the product information
-            var nameCell = document.createElement("td");
-            nameCell.textContent = productName;
+            // Add the product to the stored products array
+            storedProducts.push(newProduct);
 
-            var imageCell = document.createElement("td");
-            var imageElement = document.createElement("img");
-            imageElement.src = productImage;
-            imageElement.style.maxWidth = "100px";
-            imageCell.appendChild(imageElement);
-
-            var linkCell = document.createElement("td");
-            var linkElement = document.createElement("a");
-            linkElement.href = productLink;
-            linkElement.textContent = "View Product";
-            linkCell.appendChild(linkElement);
-
-            // Append the cells to the row
-            newRow.appendChild(nameCell);
-            newRow.appendChild(imageCell);
-            newRow.appendChild(linkCell);
-
-            // Append the row to the table
-            document.getElementById("productTable").appendChild(newRow);
+            // Save the updated products to local storage
+            localStorage.setItem("uploadedProducts", JSON.stringify(storedProducts));
 
             // Clear the form fields
             document.getElementById("productName").value = "";
             document.getElementById("productImage").value = "";
             document.getElementById("productLink").value = "";
+
+            // Render the updated products on the page
+            renderProducts();
         });
+
+        // Render the stored products on page load
+        renderProducts();
     </script>
 </body>
 </html>
