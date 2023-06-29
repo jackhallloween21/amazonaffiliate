@@ -31,10 +31,26 @@
             text-align: left;
         }
     </style>
+     <link rel="stylesheet" href="dark-mode.css" />
 </head>
 <body>
     <h1>Amazon Affiliate Products</h1>
-    
+   
+ <button onclick="toggleDarkMode()">Toggle Dark Mode</button>
+
+  <script>
+    function toggleDarkMode() {
+      const body = document.body;
+      const darkModeEnabled = body.classList.toggle("dark-mode");
+      body.classList.toggle("light-mode", !darkModeEnabled);
+      localStorage.setItem("darkModeEnabled", darkModeEnabled);
+    }
+
+    const storedDarkModeEnabled = localStorage.getItem("darkModeEnabled");
+    if (storedDarkModeEnabled === "true") {
+      document.body.classList.add("dark-mode");
+    }
+  </script>
     <form id="searchForm">
         <label for="search">Search for a product:</label>
         <input type="text" id="search" name="search">
