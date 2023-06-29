@@ -30,27 +30,15 @@
             padding: 8px;
             text-align: left;
         }
+        .embedded-product {
+            display: inline-block;
+            margin-bottom: 10px;
+        }
     </style>
-     <link rel="stylesheet" href="dark-mode.css" />
 </head>
 <body>
-    <h1 style="color:white;">Amazon Affiliate Products</h1>
-   
- <button onclick="toggleDarkMode()">🔆 Toggle Dark / Light Mode 🌙</button>
-
-  <script>
-    function toggleDarkMode() {
-      const body = document.body;
-      const darkModeEnabled = body.classList.toggle("dark-mode");
-      body.classList.toggle("light-mode", !darkModeEnabled);
-      localStorage.setItem("darkModeEnabled", darkModeEnabled);
-    }
-
-    const storedDarkModeEnabled = localStorage.getItem("darkModeEnabled");
-    if (storedDarkModeEnabled === "true") {
-      document.body.classList.add("dark-mode");
-    }
-  </script>
+    <h1>Amazon Affiliate Products</h1>
+    
     <form id="searchForm">
         <label for="search">Search for a product:</label>
         <input type="text" id="search" name="search">
@@ -65,11 +53,8 @@
         <label for="productName">Product Name:</label>
         <input type="text" id="productName" name="productName">
         <br><br>
-        <label for="productImage">Product Image URL:</label>
-        <input type="text" id="productImage" name="productImage">
-        <br><br>
-        <label for="productLink">Product Link:</label>
-        <input type="text" id="productLink" name="productLink">
+        <label for="productEmbed">Product Embed:</label>
+        <textarea id="productEmbed" name="productEmbed"></textarea>
         <br><br>
         <input type="submit" value="Upload">
     </form>
@@ -78,13 +63,7 @@
     
     <h2>Uploaded Products:</h2>
     
-    <table id="productTable">
-        <tr>
-            <th>Product Name</th>
-            <th>Product Image</th>
-            <th>Product Link</th>
-        </tr>
-    </table>
+    <div id="productContainer"></div>
 
     <script>
         // Retrieve stored products from local storage, if any
@@ -92,33 +71,18 @@
 
         // Function to render the stored products on the page
         function renderProducts() {
-            var productTable = document.getElementById("productTable");
+            var productContainer = document.getElementById("productContainer");
+            productContainer.innerHTML = ""; // Clear the container
 
-            // Clear the existing rows
-            while (productTable.rows.length > 1) {
-                productTable.deleteRow(1);
-            }
-
-            // Add rows for each stored product
+            // Add products to the container
             for (var i = 0; i < storedProducts.length; i++) {
                 var product = storedProducts[i];
 
-                var newRow = productTable.insertRow(-1);
+                var productElement = document.createElement("div");
+                productElement.className = "embedded-product";
+                productElement.innerHTML = product.embed;
 
-                var nameCell = newRow.insertCell(0);
-                nameCell.textContent = product.name;
-
-                var imageCell = newRow.insertCell(1);
-                var imageElement = document.createElement("img");
-                imageElement.src = product.image;
-                imageElement.style.maxWidth = "100px";
-                imageCell.appendChild(imageElement);
-
-                var linkCell = newRow.insertCell(2);
-                var linkElement = document.createElement("a");
-                linkElement.href = product.link;
-                linkElement.textContent = "View Product";
-                linkCell.appendChild(linkElement);
+                productContainer.appendChild(productElement);
             }
         }
 
@@ -128,14 +92,12 @@
 
             // Get the values from the form fields
             var productName = document.getElementById("productName").value;
-            var productImage = document.getElementById("productImage").value;
-            var productLink = document.getElementById("productLink").value;
+            var productEmbed = document.getElementById("productEmbed").value;
 
             // Create an object for the uploaded product
             var newProduct = {
                 name: productName,
-                image: productImage,
-                link: productLink
+                embed: productEmbed
             };
 
             // Add the product to the stored products array
@@ -146,8 +108,7 @@
 
             // Clear the form fields
             document.getElementById("productName").value = "";
-            document.getElementById("productImage").value = "";
-            document.getElementById("productLink").value = "";
+            document.getElementById("productEmbed").value = "";
 
             // Render the updated products on the page
             renderProducts();
