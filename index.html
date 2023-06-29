@@ -35,17 +35,17 @@
 <body>
     <h1>Amazon Affiliate Products</h1>
     
-    <form>
+    <form id="searchForm">
         <label for="search">Search for a product:</label>
         <input type="text" id="search" name="search">
         <input type="submit" value="Search">
     </form>
-    <iframe sandbox="allow-popups allow-scripts allow-modals allow-forms allow-same-origin" style="width:120px;height:240px;" marginwidth="0" marginheight="0" scrolling="no" frameborder="0" src="//ws-in.amazon-adsystem.com/widgets/q?ServiceVersion=20070822&OneJS=1&Operation=GetAdHtml&MarketPlace=IN&source=ss&ref=as_ss_li_til&ad_type=product_link&tracking_id=techprodu0f42-21&language=en_IN&marketplace=amazon&region=IN&placement=B09MT6SWDL&asins=B09MT6SWDL&linkId=313dcbf5933a6e3822ab4a4dc5a52c26&show_border=false&link_opens_in_new_window=true"></iframe>
+    
     <hr>
     
     <h2>Upload a product:</h2>
     
-    <form>
+    <form id="uploadForm">
         <label for="productName">Product Name:</label>
         <input type="text" id="productName" name="productName">
         <br><br>
@@ -62,13 +62,56 @@
     
     <h2>Uploaded Products:</h2>
     
-    <table>
+    <table id="productTable">
         <tr>
             <th>Product Name</th>
             <th>Product Image</th>
             <th>Product Link</th>
         </tr>
-        <!-- Add dynamically generated rows for each uploaded product here -->
     </table>
+
+    <script>
+        // Handle form submission for uploading a product
+        document.getElementById("uploadForm").addEventListener("submit", function(event) {
+            event.preventDefault(); // Prevent the form from submitting
+
+            // Get the values from the form fields
+            var productName = document.getElementById("productName").value;
+            var productImage = document.getElementById("productImage").value;
+            var productLink = document.getElementById("productLink").value;
+
+            // Create a new row for the uploaded product
+            var newRow = document.createElement("tr");
+
+            // Create table cells for the product information
+            var nameCell = document.createElement("td");
+            nameCell.textContent = productName;
+
+            var imageCell = document.createElement("td");
+            var imageElement = document.createElement("img");
+            imageElement.src = productImage;
+            imageElement.style.maxWidth = "100px";
+            imageCell.appendChild(imageElement);
+
+            var linkCell = document.createElement("td");
+            var linkElement = document.createElement("a");
+            linkElement.href = productLink;
+            linkElement.textContent = "View Product";
+            linkCell.appendChild(linkElement);
+
+            // Append the cells to the row
+            newRow.appendChild(nameCell);
+            newRow.appendChild(imageCell);
+            newRow.appendChild(linkCell);
+
+            // Append the row to the table
+            document.getElementById("productTable").appendChild(newRow);
+
+            // Clear the form fields
+            document.getElementById("productName").value = "";
+            document.getElementById("productImage").value = "";
+            document.getElementById("productLink").value = "";
+        });
+    </script>
 </body>
 </html>
