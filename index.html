@@ -86,7 +86,7 @@
 
     <script>
         // Retrieve stored products from GitHub repository, if any
-        fetch('https://api.github.com/repos/<username>/<repository>/contents/products.json')
+        fetch('https://api.github.com/repos/jackhallloween21/amazonaffiliate/contents/products.json')
             .then(response => response.json())
             .then(data => {
                 const products = JSON.parse(atob(data.content));
@@ -145,7 +145,7 @@
             };
 
             // Retrieve existing products from GitHub repository, if any
-            fetch('https://api.github.com/repos/<username>/<repository>/contents/products.json')
+            fetch('https://api.github.com/repos/jackhallloween21/amazonaffiliate/contents/products.json')
                 .then(response => response.json())
                 .then(data => {
                     const products = JSON.parse(atob(data.content));
@@ -155,10 +155,10 @@
                     const fileContent = JSON.stringify(products, null, 2);
                     const encodedContent = btoa(fileContent);
                     
-                    fetch(`https://api.github.com/repos/<username>/<repository>/contents/products.json`, {
+                    fetch(`https://api.github.com/repos/jackhallloween21/amazonaffiliate/contents/products.json`, {
                         method: 'PUT',
                         headers: {
-                            'Authorization': 'Bearer <access_token>',
+                            'Authorization': 'Bearer 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',
                             'Content-Type': 'application/json'
                         },
                         body: JSON.stringify({
