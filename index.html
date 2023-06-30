@@ -31,26 +31,10 @@
             text-align: left;
         }
     </style>
-     <link rel="stylesheet" href="dark-mode.css" />
 </head>
 <body>
-    <h1 style="color:white;">Amazon Affiliate Products</h1>
-   
- <button onclick="toggleDarkMode()">🔆 Toggle Dark / Light Mode 🌙</button>
-
-  <script>
-    function toggleDarkMode() {
-      const body = document.body;
-      const darkModeEnabled = body.classList.toggle("dark-mode");
-      body.classList.toggle("light-mode", !darkModeEnabled);
-      localStorage.setItem("darkModeEnabled", darkModeEnabled);
-    }
-
-    const storedDarkModeEnabled = localStorage.getItem("darkModeEnabled");
-    if (storedDarkModeEnabled === "true") {
-      document.body.classList.add("dark-mode");
-    }
-  </script>
+    <h1>Amazon Affiliate Products</h1>
+    
     <form id="searchForm">
         <label for="search">Search for a product:</label>
         <input type="text" id="search" name="search">
@@ -87,11 +71,19 @@
     </table>
 
     <script>
-        // Retrieve stored products from local storage, if any
-        var storedProducts = JSON.parse(localStorage.getItem("uploadedProducts")) || [];
+        // Retrieve stored products from GitHub repository, if any
+        fetch('https://api.github.com/repos/<username>/<repository>/contents/products.json')
+            .then(response => response.json())
+            .then(data => {
+                const products = JSON.parse(atob(data.content));
+                renderProducts(products);
+            })
+            .catch(error => {
+                console.log('Error retrieving products:', error);
+            });
 
-        // Function to render the stored products on the page
-        function renderProducts() {
+        // Function to render the products on the page
+        function renderProducts(products) {
             var productTable = document.getElementById("productTable");
 
             // Clear the existing rows
@@ -99,9 +91,9 @@
                 productTable.deleteRow(1);
             }
 
-            // Add rows for each stored product
-            for (var i = 0; i < storedProducts.length; i++) {
-                var product = storedProducts[i];
+            // Add rows for each product
+            for (var i = 0; i < products.length; i++) {
+                var product = products[i];
 
                 var newRow = productTable.insertRow(-1);
 
@@ -117,7 +109,7 @@
                 var linkCell = newRow.insertCell(2);
                 var linkElement = document.createElement("a");
                 linkElement.href = product.link;
-                linkElement.textContent = "View Product";
+                linkElement.textContent = product.link;
                 linkCell.appendChild(linkElement);
             }
         }
@@ -138,23 +130,49 @@
                 link: productLink
             };
 
-            // Add the product to the stored products array
-            storedProducts.push(newProduct);
+            // Retrieve existing products from GitHub repository, if any
+            fetch('https://api.github.com/repos/<username>/<repository>/contents/products.json')
+                .then(response => response.json())
+                .then(data => {
+                    const products = JSON.parse(atob(data.content));
+                    products.push(newProduct);
+                    
+                    // Update the products file in the repository
+                    const fileContent = JSON.stringify(products, null, 2);
+                    const encodedContent = btoa(fileContent);
+                    
+                    fetch(`https://api.github.com/repos/<username>/<repository>/contents/products.json`, {
+                        method: 'PUT',
+                        headers: {
+                            'Authorization': 'Bearer <access_token>',
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            message: 'Add new product',
+                            content: encodedContent,
+                            sha: data.sha
+                        })
+                    })
+                    .then(response => response.json())
+                    .then(updatedData => {
+                        console.log('Product uploaded successfully:', updatedData);
 
-            // Save the updated products to local storage
-            localStorage.setItem("uploadedProducts", JSON.stringify(storedProducts));
+                        // Clear the form fields
+                        document.getElementById("productName").value = "";
+                        document.getElementById("productImage").value = "";
+                        document.getElementById("productLink").value = "";
 
-            // Clear the form fields
-            document.getElementById("productName").value = "";
-            document.getElementById("productImage").value = "";
-            document.getElementById("productLink").value = "";
-
-            // Render the updated products on the page
-            renderProducts();
+                        // Render the updated products on the page
+                        renderProducts(products);
+                    })
+                    .catch(error => {
+                        console.log('Error updating products:', error);
+                    });
+                })
+                .catch(error => {
+                    console.log('Error retrieving products:', error);
+                });
         });
-
-        // Render the stored products on page load
-        renderProducts();
     </script>
 </body>
 </html>
